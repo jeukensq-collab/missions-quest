@@ -396,10 +396,7 @@ export default function Home() {
                             ✨ +{task.points} XP
                           </span>
 
-                          <span className="text-pink-300">
-                            🔁 {taskCount}
-                          </span>
-
+                      
                         </div>
 
                         {playerBadge && (
