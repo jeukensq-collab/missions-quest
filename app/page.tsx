@@ -26,40 +26,73 @@ export default function Home() {
   const [newBadge, setNewBadge] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadUser() {
-      const { data } = await supabase
-        .from("users")
-        .select("*")
-        .eq("name", currentPlayer)
-        .single();
+  async function loadUser() {
+    const { data } = await supabase
+      .from("users")
+      .select("*")
+      .eq("name", currentPlayer)
+      .single();
 
-      if (data) {
-        setScore(data.score);
-        setXp(data.score);
-      }
-
-      const { data: historyData } = await supabase
-        .from("history")
-        .select("*")
-        .eq("player", currentPlayer)
-        .order("created_at", { ascending: false });
-
-      if (historyData) {
-        setHistory(historyData);
-      }
-
-      const { data: badgesData } = await supabase
-        .from("badges")
-        .select("*")
-        .eq("player", currentPlayer);
-
-      if (badgesData) {
-        setBadges(badgesData);
-      }
+    if (data) {
+      setScore(data.score);
+      setXp(data.score);
     }
 
-    loadUser();
-  }, [currentPlayer]);
+    const { data: historyData } = await supabase
+      .from("history")
+      .select("*")
+      .eq("player", currentPlayer)
+      .order("created_at", { ascending: false });
+
+    if (historyData) {
+      setHistory(historyData);
+
+      const completedMap: {
+        [key: number]: number;
+      } = {};
+
+      const lastMap: {
+        [key: number]: Date;
+      } = {};
+
+      historyData.forEach((item) => {
+        const task = tasks.find(
+          (t) => t.title === item.task
+        );
+
+        if (!task) return;
+
+        completedMap[task.id] =
+          (completedMap[task.id] || 0) + 1;
+
+        const completedDate = new Date(
+          item.created_at
+        );
+
+        if (
+          !lastMap[task.id] ||
+          completedDate > lastMap[task.id]
+        ) {
+          lastMap[task.id] = completedDate;
+        }
+      });
+
+      setCompletedTasks(completedMap);
+      setLastCompleted(lastMap);
+    }
+
+    const { data: badgesData } = await supabase
+      .from("badges")
+      .select("*")
+      .eq("player", currentPlayer);
+
+    if (badgesData) {
+      setBadges(badgesData);
+    }
+  }
+
+  loadUser();
+}, [currentPlayer]);
 
   const level = Math.floor(xp / 100) + 1;
   const xpProgress = xp % 100;
