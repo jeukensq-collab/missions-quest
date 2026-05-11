@@ -164,7 +164,6 @@ export default function Home() {
     const { data: historyData } = await supabase
       .from("history")
       .select("*")
-      .eq("player", currentPlayer)
       .order("created_at", { ascending: false });
 
     if (historyData) {
