@@ -194,6 +194,22 @@ if (historyData) {
       const difference =
         (now.getTime() - lastDate.getTime()) /
         (1000 * 60 * 60 * 24);
+        
+        if (task.schedule === "weekly") {
+  return now.getDay() === task.day;
+}
+
+if (task.schedule === "biweekly") {
+
+  const weekNumber = Math.floor(
+    (now.getTime() / 86400000 + 4) / 7
+  );
+
+  return (
+    now.getDay() === task.day &&
+    weekNumber % 2 === task.referenceWeek
+  );
+}
 
       return difference >= task.reminderDays;
     });
