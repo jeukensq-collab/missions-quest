@@ -194,7 +194,7 @@ if (historyData) {
       const difference =
         (now.getTime() - lastDate.getTime()) /
         (1000 * 60 * 60 * 24);
-        
+
         if (task.schedule === "weekly") {
   return now.getDay() === task.day;
 }
@@ -213,7 +213,7 @@ if (task.schedule === "biweekly") {
 
       return difference >= task.reminderDays;
     });
-  }, [lastCompleted]);
+  }, [lastCompleted, history, tasks]);
 
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden relative">
