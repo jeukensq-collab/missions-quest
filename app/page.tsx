@@ -189,7 +189,26 @@ if (historyData) {
     return tasks.filter((task) => {
       const lastDate = lastCompleted[task.id];
 
-      if (!lastDate) return true;
+      if (!lastDate) {
+
+  if (task.schedule === "weekly") {
+    return now.getDay() === task.day;
+  }
+
+  if (task.schedule === "biweekly") {
+
+    const weekNumber = Math.floor(
+      (now.getTime() / 86400000 + 4) / 7
+    );
+
+    return (
+      now.getDay() === task.day &&
+      weekNumber % 2 === task.referenceWeek
+    );
+  }
+
+  return true;
+}
 
       const difference =
         (now.getTime() - lastDate.getTime()) /
