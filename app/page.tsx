@@ -22,6 +22,7 @@ export default function Home() {
   const [badges, setBadges] = useState<any[]>([]);
 
   const [activeTab, setActiveTab] = useState("tasks");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
 
   const [newBadge, setNewBadge] = useState<string | null>(null);
 
@@ -41,45 +42,44 @@ export default function Home() {
     const { data: historyData } = await supabase
       .from("history")
       .select("*")
-      .eq("player", currentPlayer)
       .order("created_at", { ascending: false });
 
-    if (historyData) {
-      setHistory(historyData);
+if (historyData) {
+  setHistory(historyData);
 
-      const completedMap: {
-        [key: number]: number;
-      } = {};
+  const completedMap: {
+    [key: number]: number;
+  } = {};
 
-      const lastMap: {
-        [key: number]: Date;
-      } = {};
+  const lastMap: {
+    [key: number]: Date;
+  } = {};
 
-      historyData.forEach((item) => {
-        const task = tasks.find(
-          (t) => t.title === item.task
-        );
+  historyData.forEach((item) => {
+    const task = tasks.find(
+      (t) => t.title === item.task
+    );
 
-        if (!task) return;
+    if (!task) return;
 
-        completedMap[task.id] =
-          (completedMap[task.id] || 0) + 1;
+    completedMap[task.id] =
+      (completedMap[task.id] || 0) + 1;
 
-        const completedDate = new Date(
-          item.created_at
-        );
+    const completedDate = new Date(
+      item.created_at
+    );
 
-        if (
-          !lastMap[task.id] ||
-          completedDate > lastMap[task.id]
-        ) {
-          lastMap[task.id] = completedDate;
-        }
-      });
-
-      setCompletedTasks(completedMap);
-      setLastCompleted(lastMap);
+    if (
+      !lastMap[task.id] ||
+      completedDate > lastMap[task.id]
+    ) {
+      lastMap[task.id] = completedDate;
     }
+  });
+
+  setCompletedTasks(completedMap);
+  setLastCompleted(lastMap);
+}
 
     const { data: badgesData } = await supabase
       .from("badges")
@@ -95,6 +95,18 @@ export default function Home() {
 }, [currentPlayer]);
 
   const level = Math.floor(xp / 100) + 1;
+  const categories = [
+  "ALL",
+  "🧹 Ménage",
+  "🧼 Nettoyage",
+  "👕 Linge",
+  "🍽️ Cuisine",
+  "🛒 Courses",
+  "🗑️ Déchets",
+  "🐾 Animaux",
+  "🌿 Extérieur & plantes",
+  "🔥 Cheminée",
+];
   const xpProgress = xp % 100;
 
   async function completeTask(taskId: number, points: number) {
@@ -370,10 +382,114 @@ export default function Home() {
               </div>
 
             </div>
+            <div className="flex gap-3 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+
+  {categories.map((category) => (
+
+    <button
+      key={category}
+      onClick={() => setSelectedCategory(category)}
+      className={`px-4 py-2 rounded-2xl whitespace-nowrap font-black border transition-all duration-300 ${
+        selectedCategory === category
+          ? "bg-cyan-400 text-black border-cyan-200 shadow-[0_0_20px_#00ffff]"
+          : "bg-black/40 border-white/10 text-white"
+      }`}
+    >
+
+      {category === "ALL"
+        ? "🎮 Toutes"
+        : category}
+
+    </button>
+
+  ))}
+
+</div>
 
             <div className="space-y-5">
 
-              {tasks.map((task) => {
+              {tasks
+  .filter((task) => {
+
+    if (selectedCategory === "ALL") {
+      return true;
+    }
+
+    if (
+      selectedCategory === "🧹 Ménage" &&
+      [
+        "🏠 Sols",
+        "🧰 Aspirateur classique",
+        "🤖 Aspirateur robot",
+        "✨ Poussière & rangement",
+      ].includes(task.category)
+    ) {
+      return true;
+    }
+
+    if (
+      selectedCategory === "🧼 Nettoyage" &&
+      [
+        "🧼 Nettoyage pièces",
+        "🪟 Vitres",
+        "🚽 Salle de bain",
+      ].includes(task.category)
+    ) {
+      return true;
+    }
+
+    if (
+      selectedCategory === "🍽️ Cuisine" &&
+      [
+        "🍽️ Préparation",
+        "🍽️ Vaisselle",
+      ].includes(task.category)
+    ) {
+      return true;
+    }
+
+    if (
+      selectedCategory === "🐾 Animaux" &&
+      [
+        "🐾 Chats",
+        "🐦 Oiseaux",
+        "🐾 Entretien animaux",
+      ].includes(task.category)
+    ) {
+      return true;
+    }
+
+    if (
+      selectedCategory === "🌿 Extérieur & plantes" &&
+      [
+        "🌿 Jardin & extérieur",
+        "💧 Arrosage",
+        "🛁 Jacuzzi",
+      ].includes(task.category)
+    ) {
+      return true;
+    }
+
+    if (selectedCategory === "👕 Linge") {
+      return task.category === "👕 Linge";
+    }
+
+    if (selectedCategory === "🛒 Courses") {
+      return task.category === "🛒 Courses & entretien";
+    }
+
+    if (selectedCategory === "🗑️ Déchets") {
+      return task.category === "🗑️ Déchets";
+    }
+
+    if (selectedCategory === "🔥 Cheminée") {
+      return task.category === "🔥 Cheminée";
+    }
+
+    return false;
+
+  })
+  .map((task) => {
                 const taskCount = completedTasks[task.id] || 0;
 
                 const taskBadges = badges.filter(
