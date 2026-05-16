@@ -382,8 +382,14 @@ if (task.schedule === "biweekly") {
                         </p>
 
                         <p className="text-red-200 text-sm">
-                          Tous les {task.reminderDays} jours
-                        </p>
+
+  {task.schedule === "weekly"
+    ? "Tous les jeudis"
+    : task.schedule === "biweekly"
+    ? "Un mardi sur deux"
+    : `Tous les ${task.reminderDays} jours`}
+
+</p>
                       </div>
 
                       <div className="text-yellow-300 font-black">
