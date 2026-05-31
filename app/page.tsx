@@ -106,6 +106,7 @@ if (historyData) {
   "🐾 Animaux",
   "🌿 Extérieur & plantes",
   "🔥 Cheminée",
+  "🎯 Autre",
 ];
   const xpProgress = xp % 100;
 
@@ -526,7 +527,12 @@ if (task.schedule === "biweekly") {
     if (selectedCategory === "🔥 Cheminée") {
       return task.category === "🔥 Cheminée";
     }
-
+    if (selectedCategory === "🎯 Autre") {
+  return task.category === "🎯 Autre";
+}
+if (selectedCategory === "🎯 Autre") {
+  return true;
+}
     return false;
 
   })
